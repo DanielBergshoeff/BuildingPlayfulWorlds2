@@ -6,7 +6,8 @@ public class DiffuseScript : MonoBehaviour {
 
     public float sizeDissolve = 0f;
     public float sizeSlice = 0f;
-    public float minDissolve, maxDissolve;
+    public float maxDissolve = 4.0f;
+    public float timesFactor = 3.0f;
     public bool startDissolve;
 
     public Vector3 startPosition;
@@ -23,7 +24,7 @@ public class DiffuseScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         
-        if (startDissolve && sizeSlice < 1.0f)
+        if (startDissolve && sizeSlice < maxDissolve)
         {
             sizeSlice += speedDissolve;                     
         }
@@ -43,7 +44,7 @@ public class DiffuseScript : MonoBehaviour {
             }
         }
 
-        sizeDissolve = (maxDissolve * sizeSlice);
+        sizeDissolve = (timesFactor * sizeSlice);
         myMaterial.SetFloat("_DissolveSize", sizeDissolve);
         myMaterial.SetFloat("_SliceAmount", sizeSlice);
     }
@@ -51,6 +52,7 @@ public class DiffuseScript : MonoBehaviour {
     public void StartDissolve(Vector3 startVector)
     {
         myMaterial.SetVector("_StartingVector", startVector);
+        Debug.Log(startVector);
         startDissolve = true;
     }
 }
