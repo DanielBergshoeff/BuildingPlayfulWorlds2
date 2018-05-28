@@ -52,7 +52,6 @@ public class DiffuseScript : MonoBehaviour {
     public void StartDissolve(Vector3 startVector)
     {
         myMaterial.SetVector("_StartingVector", startVector);
-        Debug.Log(startVector);
         startDissolve = true;
     }
 }
