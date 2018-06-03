@@ -104,9 +104,11 @@ public class EnemyScript : MonoBehaviour
                     GameObject hitObject = null;
                     RaycastHit hit;
                     Physics.Raycast(transform.position, newDir, out hit, attackRange * 2);
-                    if(hit.collider != null)
+                    if (hit.collider != null)
                     {
                         hitObject = hit.collider.gameObject;
+                        Debug.Log(hitObject.name);
+                        Debug.Log(target.gameObject.name);
                     }
 
                     //Do Damage
@@ -117,10 +119,16 @@ public class EnemyScript : MonoBehaviour
                         coolDown = maxCooldown;
                     }
                     //Transition
-                    else if (distanceToTarget > 2 * attackRange || target == null || hitObject != target.gameObject)
+                    else if (distanceToTarget > 2 * attackRange)
                     {
                         animator.SetBool("ShootLeft", false);
                         currentState = State.Move;
+                        GetComponentInChildren<BotScript>().target = null;
+                    }
+                    else if (target == null || hitObject != target.gameObject)
+                    {
+                        animator.SetBool("ShootLeft", false);
+                        currentState = State.Idle;
                         GetComponentInChildren<BotScript>().target = null;
                     }
                 }
