@@ -3,51 +3,160 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public enum EnemyStatus
+
+public enum State { Idle, Move, Attack }
+
+public class EnemyScript : MonoBehaviour
 {
-    WALK,
-    CHASE
-}
+    public State currentState;
+    public int damage = 20;
+    public float attackRange;
+    public float maxCooldown = 1;
+    public float senseRange = 10;
 
-public class EnemyScript : MonoBehaviour {
+    public float rotationSpeed = 3.0f;
 
-    public float detectDistance = 3f;
-    public float speed = 2f;
+    private int layerMask;
 
-    private GameObject target;
-    private EnemyStatus currentStatus;
+    private NavMeshAgent agent;
+    private Health target;
+    private float coolDown;
+    private float distanceToTarget;
 
-    NavMeshAgent agent;
-
-	// Use this for initialization
-	void Start () {
-        target = GameObject.Find("CenterEyeAnchor");
+    private Animator animator;
+    // Use this for initialization
+    void Start()
+    {
         agent = GetComponent<NavMeshAgent>();
-        currentStatus = EnemyStatus.WALK;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        if (Vector3.Distance(target.transform.position, transform.position) < detectDistance)
+        animator = GetComponentInChildren<Animator>();
+        //player = GameObject.FindGameObjectWithTag("Player");
+
+        layerMask = 1 << 10;
+        layerMask = ~layerMask;
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+        CheckState();
+
+    }
+
+    void CheckForHealth()
+    {
+        distanceToTarget = float.MaxValue;
+            Collider[] cols = Physics.OverlapSphere(transform.position, senseRange);
+            foreach (Collider c in cols)
+            {
+                if (c.gameObject == gameObject) { continue; }
+                Health hp = c.gameObject.GetComponent<Health>();
+                if (hp != null)
+                {
+                    float distToHealthScript = Vector3.Distance(transform.position, hp.transform.position);
+                    if (distToHealthScript < distanceToTarget && !Physics.Linecast(transform.position, hp.transform.position, layerMask))
+                    {
+                        target = hp;
+                        distanceToTarget = distToHealthScript;
+                    }
+                }
+            }
+    }
+
+    void CheckState()
+    {
+        //Sensing
+        if (target == null)
         {
-            currentStatus = EnemyStatus.CHASE;
+            CheckForHealth();
+
+            if (target == null)
+            {
+                currentState = State.Idle;
+            }
+
         }
         else
         {
-            currentStatus = EnemyStatus.WALK;
+            distanceToTarget = Vector3.Distance(target.transform.position, transform.position);
+            if (distanceToTarget > senseRange)
+            {
+                target = null;
+            }
         }
-        if (currentStatus == EnemyStatus.WALK)
-        {
-            //bool wallClose = Physics.Raycast(transform.position, transform.forward, 0.2f);
 
-            //if(Vector3.Distance(agent.destination, transform.position) < 0.3f || wallClose)
-            //{
-                agent.SetDestination(transform.position + new Vector3(Random.Range(-5, 5), 0, Random.Range(-5, 5)));
-            //}
-        }   
-        else if(currentStatus == EnemyStatus.CHASE)
+        //States
+        switch (currentState)
         {
-            agent.destination = target.transform.position;
-        }     
-	}
+            case State.Attack:
+                //Action
+                if (coolDown > 0)
+                {
+                    coolDown -= Time.deltaTime;
+                }
+
+                if (target != null)
+                {
+                    Vector3 newDir = Vector3.RotateTowards(transform.forward, (target.transform.position - transform.position), rotationSpeed * Time.deltaTime, 0.0f);
+                    transform.rotation = Quaternion.LookRotation(newDir);
+
+                    GameObject hitObject = null;
+                    RaycastHit hit;
+                    Physics.Raycast(transform.position, newDir, out hit, attackRange * 2);
+                    if(hit.collider != null)
+                    {
+                        hitObject = hit.collider.gameObject;
+                    }
+
+                    //Do Damage
+                    if (distanceToTarget < attackRange && coolDown <= 0 && hitObject == target.gameObject)
+                    {
+                        GetComponentInChildren<BotScript>().target = target.gameObject.transform;
+                        animator.SetBool("ShootLeft", true);
+                        coolDown = maxCooldown;
+                    }
+                    //Transition
+                    else if (distanceToTarget > 2 * attackRange || target == null || hitObject != target.gameObject)
+                    {
+                        animator.SetBool("ShootLeft", false);
+                        currentState = State.Move;
+                        GetComponentInChildren<BotScript>().target = null;
+                    }
+                }
+
+                break;
+
+            case State.Idle:
+
+                //if we are close pick a new position to walk to
+                if (agent.remainingDistance > agent.stoppingDistance)
+                {
+                    break;
+                }
+                else
+                {
+                    agent.SetDestination(transform.position + new Vector3(Random.Range(-5, 5), 0, Random.Range(-5, 5)));
+                }
+                if (distanceToTarget < senseRange)
+                {
+                    currentState = State.Move;
+                }
+
+
+                break;
+            case State.Move:
+                //Move to the target      
+                if (distanceToTarget < attackRange && !Physics.Linecast(transform.position, target.transform.position, layerMask))
+                {
+                    currentState = State.Attack;
+                }
+                else if(target != null)
+                {
+                    agent.SetDestination(transform.position + (target.transform.position - transform.position) / 2);
+                }
+
+                break;
+        }
+    }
 }

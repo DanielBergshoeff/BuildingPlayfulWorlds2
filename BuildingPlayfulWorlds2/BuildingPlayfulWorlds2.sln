@@ -1,11 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2017
+# Visual Studio 2015
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingPlayfulWorlds2", "BuildingPlayfulWorlds2.csproj", "{732461A4-CDA4-C102-B169-BECED56B5826}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingPlayfulWorlds2.Editor", "BuildingPlayfulWorlds2.Editor.csproj", "{890AF4A8-CC25-531A-86A4-234D85B880F6}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingPlayfulWorlds2.Editor", "BuildingPlayfulWorlds2.Editor.csproj", "{890AF4A8-CC25-531A-86A4-234D85B880F6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingPlayfulWorlds2.Editor", "BuildingPlayfulWorlds2.Editor.csproj", "{890AF4A8-CC25-531A-86A4-234D85B880F6}"
 EndProject
@@ -19,14 +15,6 @@ Global
 		{732461A4-CDA4-C102-B169-BECED56B5826}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{732461A4-CDA4-C102-B169-BECED56B5826}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{732461A4-CDA4-C102-B169-BECED56B5826}.Release|Any CPU.Build.0 = Release|Any CPU
-		{890AF4A8-CC25-531A-86A4-234D85B880F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{890AF4A8-CC25-531A-86A4-234D85B880F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{890AF4A8-CC25-531A-86A4-234D85B880F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{890AF4A8-CC25-531A-86A4-234D85B880F6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{890AF4A8-CC25-531A-86A4-234D85B880F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{890AF4A8-CC25-531A-86A4-234D85B880F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{890AF4A8-CC25-531A-86A4-234D85B880F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{890AF4A8-CC25-531A-86A4-234D85B880F6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{890AF4A8-CC25-531A-86A4-234D85B880F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{890AF4A8-CC25-531A-86A4-234D85B880F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{890AF4A8-CC25-531A-86A4-234D85B880F6}.Release|Any CPU.ActiveCfg = Release|Any CPU

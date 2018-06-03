@@ -11,6 +11,9 @@ public class SphereScript : MonoBehaviour {
     public AudioClip[] audioClips;
 
     private bool btnPressedLast;
+    private bool pull;
+
+    public float pullBackSpeed = 5.0f;
 
     private Transform leftCube;
     private Transform rightCube;
@@ -48,16 +51,26 @@ public class SphereScript : MonoBehaviour {
         localPosLeftCube = leftCube.localPosition;
         localPosRightCube = rightCube.localPosition;
 
-        if (OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger, OVRInput.Controller.RTouch) > 0.1)
+        if(OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, OVRInput.Controller.RTouch) > 0.1 && OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, OVRInput.Controller.LTouch) > 0.1) {
+            StartCoroutine(Teleport());
+        }
+        else if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, OVRInput.Controller.RTouch) > 0.1)
         {
             FlyRight();
             if (!btnPressedLast)
             {
-                Debug.Log("Play sound!");
                 int audioClipToPlay = Random.Range(0, audioClips.Length - 1);
                 GetComponent<AudioSource>().PlayOneShot(audioClips[audioClipToPlay]);
             }
             btnPressedLast = true;            
+        }
+        else if (OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger, OVRInput.Controller.RTouch) > 0.1)
+        {
+            //pullBackObject.GetComponent<Rigidbody>().useGravity = false;
+            rigidBody.isKinematic = true;
+            rigidBody.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            rigidBody.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+            pull = true;
         }
         else if (btnPressedLast)
         {
@@ -68,26 +81,44 @@ public class SphereScript : MonoBehaviour {
             }
             btnPressedLast = false;
         }
+
+        if (pull == true)
+        {
+            if (Vector3.Distance(transform.position, rightCube.transform.position) < 0.01f)
+            {
+                //pullBackObject.GetComponent<Rigidbody>().useGravity = true;
+                GetComponent<Rigidbody>().isKinematic = false;
+                pull = false;
+                GetComponent<Renderer>().material.SetColor("_Color", Color.white);
+            }
+            else
+            {
+                PullToHand();
+            }
+        }
     }
 
-    void OnCollisionEnter(Collision col)
+    void OnColliderEnter (Collision col)
     {
-        if(col.gameObject.tag == "BounceObject")
-        {
-            Vector3 contactNormal = col.contacts[0].normal;
-            rigidBody.AddForce(contactNormal * force, ForceMode.Impulse);
-        }
-        else if(col.gameObject.tag == "Enemy")
+        if(col.gameObject.tag == "Enemy")
         {
             if(col.gameObject.GetComponent<DiffuseScript>() != null)
             {
-                col.gameObject.GetComponent<DiffuseScript>().StartDissolve(col.contacts[0].point);
+                if (col.gameObject.GetComponent<DiffuseScript>().startDissolve != true)
+                {
+                    col.gameObject.GetComponent<DiffuseScript>().StartDissolve(transform.position);
+                }
             }
             else
             {
                 Destroy(col.gameObject);
             }            
         }
+    }
+
+    void PullToHand()
+    {
+        transform.position = Vector3.MoveTowards(transform.position, rightCube.transform.position, Time.deltaTime * pullBackSpeed);
     }
 
     void FlyRight()
@@ -121,5 +152,16 @@ public class SphereScript : MonoBehaviour {
 
             rigidBody.AddForce(new Vector3(averageRight[0], averageRight[1], averageRight[2]) * forceMoveSphere);
         }
+    }
+
+    IEnumerator Teleport()
+    {
+        Vector3 currentPosOrb = transform.position;
+        Vector3 currentPosPlayer = GameObject.Find("OVRPlayerController").transform.position;
+        GameObject.Find("CenterEyeAnchor").GetComponent<OVRScreenFade>().FadeOut();
+        yield return new WaitForSeconds(0.25f);
+        transform.position = currentPosPlayer;
+        GameObject.Find("OVRPlayerController").transform.position = currentPosOrb;
+        GameObject.Find("CenterEyeAnchor").GetComponent<OVRScreenFade>().FadeIn();
     }
 }
