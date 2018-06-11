@@ -98,7 +98,7 @@ public class SphereScript : MonoBehaviour {
         }
     }
 
-    void OnColliderEnter (Collision col)
+    void OnCollisionEnter (Collision col)
     {
         if(col.gameObject.tag == "Enemy")
         {
