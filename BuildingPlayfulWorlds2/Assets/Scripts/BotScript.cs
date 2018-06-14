@@ -8,6 +8,7 @@ public class BotScript : MonoBehaviour {
     public float shotRange = 50f;
 
     public Transform target;
+    public AudioClip shotClip;
 
     public GameObject armLeft;
     public GameObject armLeftEnd;
@@ -30,6 +31,9 @@ public class BotScript : MonoBehaviour {
         {
             StartCoroutine(ShootLeftEffect());
 
+            GetComponent<AudioSource>().clip = shotClip;
+            GetComponent<AudioSource>().Play();
+
             RaycastHit hit;
             lineRendererLeft.SetPosition(0, armLeftEnd.transform.position);
 
@@ -43,6 +47,8 @@ public class BotScript : MonoBehaviour {
             {
                 lineRendererLeft.SetPosition(1, armLeftEnd.transform.position + (-direction * shotRange));
             }
+
+            target.GetComponent<Health>().TakeDamage(1);
         }
     }
 

@@ -14,11 +14,8 @@ public class DiffuseScript : MonoBehaviour {
 
     public float speedDissolve = 0.01f;
 
-    private Material myMaterial;
-
 	// Use this for initialization
 	void Start () {
-        myMaterial = GetComponent<Renderer>().material;      
     }
 	
 	// Update is called once per frame
@@ -41,17 +38,38 @@ public class DiffuseScript : MonoBehaviour {
             else
             {
                 Destroy(gameObject);
+                if (gameObject.tag == "Enemy")
+                {
+                    GameManager.Points += 1;
+                }
+                if(gameObject.tag == "HealthShrine")
+                {
+                    GameManager.HealthShrines -= 1;
+                }
             }
         }
 
         sizeDissolve = (timesFactor * sizeSlice);
-        myMaterial.SetFloat("_DissolveSize", sizeDissolve);
-        myMaterial.SetFloat("_SliceAmount", sizeSlice);
+
+        foreach (Renderer ren in GetComponentsInChildren<Renderer>())
+        {
+            foreach (Material mat in ren.materials)
+            {
+                mat.SetFloat("_DissolveSize", sizeDissolve);
+                mat.SetFloat("_SliceAmount", sizeSlice);
+            }
+        }
     }
 
     public void StartDissolve(Vector3 startVector)
     {
-        myMaterial.SetVector("_StartingVector", startVector);
+        foreach (Renderer ren in GetComponentsInChildren<Renderer>())
+        {
+            foreach (Material mat in ren.materials)
+            {
+                mat.SetVector("_StartingVector", startVector);
+            }
+        }        
         startDissolve = true;
     }
 }

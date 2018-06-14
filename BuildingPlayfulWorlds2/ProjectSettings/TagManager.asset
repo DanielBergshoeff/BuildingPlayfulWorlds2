@@ -7,6 +7,8 @@ TagManager:
   - PulledObject
   - BounceObject
   - Enemy
+  - CircleGoal
+  - HealthShrine
   layers:
   - Default
   - TransparentFX

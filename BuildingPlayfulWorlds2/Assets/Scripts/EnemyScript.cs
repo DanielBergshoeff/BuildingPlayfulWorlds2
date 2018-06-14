@@ -23,7 +23,7 @@ public class EnemyScript : MonoBehaviour
     private float coolDown;
     private float distanceToTarget;
 
-    private Animator animator;
+    public Animator animator;
     // Use this for initialization
     void Start()
     {
@@ -55,7 +55,7 @@ public class EnemyScript : MonoBehaviour
                 if (hp != null)
                 {
                     float distToHealthScript = Vector3.Distance(transform.position, hp.transform.position);
-                    if (distToHealthScript < distanceToTarget && !Physics.Linecast(transform.position, hp.transform.position, layerMask))
+                    if (distToHealthScript < distanceToTarget)
                     {
                         target = hp;
                         distanceToTarget = distToHealthScript;
@@ -125,12 +125,6 @@ public class EnemyScript : MonoBehaviour
                         currentState = State.Move;
                         GetComponentInChildren<BotScript>().target = null;
                     }
-                    else if (target == null || hitObject != target.gameObject)
-                    {
-                        animator.SetBool("ShootLeft", false);
-                        currentState = State.Idle;
-                        GetComponentInChildren<BotScript>().target = null;
-                    }
                 }
 
                 break;
@@ -155,7 +149,7 @@ public class EnemyScript : MonoBehaviour
                 break;
             case State.Move:
                 //Move to the target      
-                if (distanceToTarget < attackRange && !Physics.Linecast(transform.position, target.transform.position, layerMask))
+                if (distanceToTarget < attackRange)
                 {
                     currentState = State.Attack;
                 }

@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public static class GameManager {
     private static int points;
+
+    private static int healthShrines;
 
     private static int currentLevel;
 
@@ -18,6 +21,7 @@ public static class GameManager {
         set
         {
             points = value;
+            CheckPoints();
         }
     }
 
@@ -43,5 +47,48 @@ public static class GameManager {
         {
             scenes = value;
         }
+    }
+
+    public static int HealthShrines
+    {
+        get
+        {
+            return healthShrines;
+        }
+        set
+        {
+            healthShrines = value;
+            if(healthShrines <= 0)
+            {
+                RestartLevel();
+            }
+        }
+    }
+
+    public static void NextLevel()
+    {
+        CurrentLevel++;
+        SceneManager.LoadScene(currentLevel);
+    }    
+
+    public static void CheckPoints()
+    {
+        if(points > 0 && currentLevel == 0)
+        {
+            NextLevel();
+        }
+        else if(points > 1 && currentLevel == 1)
+        {
+            NextLevel();
+        }
+        else if(points > 4 && currentLevel == 2)
+        {
+            NextLevel();
+        }
+    }
+
+    public static void RestartLevel()
+    {
+        SceneManager.LoadScene(currentLevel);
     }
 }

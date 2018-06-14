@@ -10,6 +10,8 @@ public class SphereScript : MonoBehaviour {
 
     public AudioClip[] audioClips;
 
+    public AudioClip positiveSound;
+
     private bool btnPressedLast;
     private bool pull;
 
@@ -36,14 +38,19 @@ public class SphereScript : MonoBehaviour {
     private float[] averageRight = new float[3];
     private float[] averageLeft = new float[3];
 
+    private Vector3 resetPosition;
+
     private Rigidbody rigidBody;
 
 	// Use this for initialization
 	void Start () {
         rigidBody = GetComponent<Rigidbody>();
+        resetPosition = transform.position;
 
         rightCube = GameObject.Find("RightHandAnchor").transform;
         leftCube = GameObject.Find("LeftHandAnchor").transform;
+
+        GameManager.HealthShrines = 4;
     }
 	
 	// Update is called once per frame
@@ -102,6 +109,13 @@ public class SphereScript : MonoBehaviour {
     {
         if(col.gameObject.tag == "Enemy")
         {
+            if (col.gameObject.GetComponent<EnemyScript>().enabled)
+            {
+                col.gameObject.GetComponent<EnemyScript>().animator.SetBool("ShootLeft", false);
+                col.gameObject.GetComponent<EnemyScript>().enabled = false;
+                col.gameObject.GetComponentInChildren<BotScript>().enabled = false;
+            }
+
             if(col.gameObject.GetComponent<DiffuseScript>() != null)
             {
                 if (col.gameObject.GetComponent<DiffuseScript>().startDissolve != true)
@@ -113,6 +127,16 @@ public class SphereScript : MonoBehaviour {
             {
                 Destroy(col.gameObject);
             }            
+        }
+        else if(col.gameObject.tag == "CircleGoal")
+        {
+            GetComponent<AudioSource>().PlayOneShot(positiveSound);
+            GameManager.Points += 1;
+        }
+        else if(col.gameObject.name == "ResetOrb")
+        {
+            rigidBody.velocity = Vector3.zero;
+            transform.position = resetPosition;
         }
     }
 
